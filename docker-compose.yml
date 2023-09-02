@@ -1,0 +1,38 @@
+version: '3.9'
+
+services:
+  # nginx-proxy:
+  #   image: jwilder/nginx-proxy
+  #   ports:
+  #     - "80:80"
+  #   volumes:
+  #     - /var/run/docker.sock:/tmp/docker.sock:ro
+  #   profiles:
+  #     - dev
+
+  apis:
+    build:
+      dockerfile: Dockerfile
+      context: ./
+    environment:
+      - VIRTUAL_HOST=localhost
+      - VIRTUAL_PORT=5000
+    env_file:
+      - .env.backend
+    profiles:
+      - dev
+
+  # Dev
+  db:
+    image: postgres:14-alpine
+    volumes:
+      - ./docker-data/db:/postgres/docker-entrypoint-initdb.d/
+    ports:
+      - '5431:5432'
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_DB=postgres
+    profiles:
+      - local
+      - dev
